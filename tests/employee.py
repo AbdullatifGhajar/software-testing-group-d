@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
+
+from .team import Team
 
 @dataclass
 class BasicInfo:
@@ -100,7 +102,14 @@ class EmployeePage:
             city=self.page.locator("#id_city").get_attribute("value") or "",
             zip_code=self.page.locator("#id_zip_code").get_attribute("value") or "",
         )
+    
+    def add_employee_to_team(self, employee: Employee, team: Team):
+        self.navigate_to_edit_employee(employee)
 
+        self.page.get_by_role("link", name="Add to team").click()
+        self.page.get_by_label("Team").select_option(index=1)  # TODO: replace with team name 
+        self.page.get_by_role("button", name="Add").click()
+        
 
         
 
