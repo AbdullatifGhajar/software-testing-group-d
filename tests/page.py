@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright
 
+from .database import reset_database
 
 def with_playwright_page(func):
     def wrapper(*args, **kwargs):
@@ -7,6 +8,8 @@ def with_playwright_page(func):
             browser = playwright.chromium.launch(headless=True)
             context = browser.new_context()
             page = context.new_page()
+
+            reset_database(page)
 
             func(page, *args, **kwargs)
 
