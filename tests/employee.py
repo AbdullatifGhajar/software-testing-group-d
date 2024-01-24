@@ -71,7 +71,27 @@ class EmployeePage:
         self.navigate_to_employee_list_page()
         self.page.get_by_role("link", name="Edit").click() # TODO: click on the right employee
 
-    def saved_address(self, employee: Employee) -> Address:
+    def edit_employee_address(self, employee: Employee, new_address: Address):
+        self.navigate_to_edit_employee(employee)
+
+        self.page.get_by_role("link", name="Update address").click()
+        self.page.locator("#id_address_line1").click()
+        self.page.locator("#id_address_line1").fill(new_address.address_line1)
+
+        if new_address.address_line2:
+            self.page.locator("#id_address_line2").click()
+            self.page.locator("#id_address_line2").fill(new_address.address_line2)
+
+        self.page.locator("#id_city").click()
+        self.page.locator("#id_city").fill(new_address.city)
+
+        self.page.locator("#id_zip_code").click()
+        self.page.locator("#id_zip_code").fill(new_address.zip_code)
+
+        self.page.get_by_role("button", name="Update").click()
+
+
+    def saved_address_on_page(self, employee: Employee) -> Address:
         self.navigate_to_edit_employee(employee)
         self.page.get_by_role("link", name="Update address").click()
         return Address(
