@@ -1,14 +1,11 @@
-from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Playwright, sync_playwright, expect, Page
 
 
-def run(playwright: Playwright) -> None:
-    browser = playwright.chromium.launch(headless=False)
-    context = browser.new_context()
-    page = context.new_page()
+def add_employee(page: Page, employee_name: str) -> None:
     page.goto("https://d.hr.dmerej.info/")
     page.get_by_role("link", name="Add new employee").click()
     page.get_by_placeholder("Name").click()
-    page.get_by_placeholder("Name").fill("Pauline")
+    page.get_by_placeholder("Name").fill(employee_name)
     page.get_by_placeholder("Email").click()
     page.get_by_placeholder("Email").fill("pauline@gmail.com")
     page.get_by_role("button", name="Add").click()
@@ -24,10 +21,29 @@ def run(playwright: Playwright) -> None:
     page.get_by_placeholder("Job title").fill("Test Job")
     page.get_by_role("button", name="Add").click()
 
-    # ---------------------
-    context.close()
-    browser.close()
+def check_employee(page: Page, employee_name: str) -> None:
+    page.goto("https://d.hr.dmerej.info/employees")
+    
+    # check if employee is in the list
+    employee_row = page.get_by_role("cell", name=employee_name, exact=True)
+    expect(employee_row).to_be_visible()
 
 
-with sync_playwright() as playwright:
-    run(playwright)
+def test_employee_added():
+    employee_name = "Pauline"
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
+
+        add_employee(page, employee_name)
+        check_employee(page, employee_name)
+
+        context.close()
+        browser.close()
+
+
+
+
+
