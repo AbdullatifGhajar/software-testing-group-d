@@ -1,7 +1,5 @@
 from playwright.sync_api import expect, Page
 
-from .page import with_playwright_page
-
 
 def add_employee(page: Page, employee_name: str) -> None:
     page.goto("https://d.hr.dmerej.info/")
@@ -32,8 +30,7 @@ def check_employee(page: Page, employee_name: str) -> None:
     expect(employee_cell).to_be_visible()
 
 
-@with_playwright_page
-def test_employee_added(page: Page):
+def test_employee_added(reset_db, page: Page):
     employee_name = "Pauline"
 
     add_employee(page, employee_name)
