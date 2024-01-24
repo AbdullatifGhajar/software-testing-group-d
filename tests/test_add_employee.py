@@ -1,4 +1,6 @@
-from playwright.sync_api import Playwright, sync_playwright, expect, Page
+from playwright.sync_api import expect, Page
+
+from .page import with_playwright_page
 
 
 def add_employee(page: Page, employee_name: str) -> None:
@@ -10,7 +12,7 @@ def add_employee(page: Page, employee_name: str) -> None:
     page.get_by_placeholder("Email").fill("pauline@gmail.com")
     page.get_by_role("button", name="Add").click()
     page.locator("#id_address_line1").click()
-    page.locator("#id_address_line1").fill("25 ")
+    page.locator("#id_address_line1").fill("25")
     page.get_by_placeholder("City").click()
     page.get_by_placeholder("City").fill("Cool")
     page.get_by_placeholder("Zip code").click()
@@ -21,29 +23,18 @@ def add_employee(page: Page, employee_name: str) -> None:
     page.get_by_placeholder("Job title").fill("Test Job")
     page.get_by_role("button", name="Add").click()
 
+
 def check_employee(page: Page, employee_name: str) -> None:
     page.goto("https://d.hr.dmerej.info/employees")
-    
+
     # check if employee is in the list
-    employee_row = page.get_by_role("cell", name=employee_name, exact=True)
-    expect(employee_row).to_be_visible()
+    employee_cell = page.get_by_role("cell", name=employee_name, exact=True)
+    expect(employee_cell).to_be_visible()
 
 
-def test_employee_added():
+@with_playwright_page
+def test_employee_added(page: Page):
     employee_name = "Pauline"
 
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
-
-        add_employee(page, employee_name)
-        check_employee(page, employee_name)
-
-        context.close()
-        browser.close()
-
-
-
-
-
+    add_employee(page, employee_name)
+    check_employee(page, employee_name)
